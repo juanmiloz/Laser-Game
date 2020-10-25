@@ -6,12 +6,18 @@ public class Box {
 	Box right;
 	Box up;
 	Box down;
+	String mirror;
+	int numRow;
+	int numColumn;
 	
-	public Box() {
+	public Box(int numRow, int numColumn) {
 		left = null;
 		right = null;
 		up = null;
 		down = null;
+		mirror = null;
+		this.numRow = numRow;
+		this.numColumn = numColumn;
 	}
 	
 	public void setLeft(Box left) {
@@ -44,5 +50,21 @@ public class Box {
 	
 	public Box getDown() {
 		return down;
+	}
+	
+	public void setNumRow(int numRow) {
+		this.numRow = numRow;
+	}
+	
+	public int getNumRow() {
+		return numRow;
+	}
+	
+	public void setNumColumn(int numColumn) {
+		this.numColumn = numColumn;
+	}
+	
+	public int getNumColumn() {
+		return numColumn; 
 	}
 }
