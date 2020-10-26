@@ -50,6 +50,13 @@ public class Menu {
 		int m = Integer.parseInt(dataGame[2]);
 		int k = Integer.parseInt(dataGame[3]);
 		laserGame.createPlayArea(nickname, n, m, k);
+		
+	}
+	
+	public void continueGame(String input,int n,int m, int k) {
+		if((int)(input.charAt(0))<=n) {
+			
+		}
 	}
 	
 	public void showPositions() {
@@ -59,29 +66,4 @@ public class Menu {
 	public void startProgram() {
 		controlatorMenu();
 	}
-	
-	/*
-	public void mainMenu(){
-		int option = 0;
-		do {
-			System.out.println("===========================");
-			System.out.println("|Bienvenido al juego láser|");
-			System.out.println("===========================");
-			System.out.println("Digite la opcion deseada");
-			System.out.println("(1)<---Iniciar juego");
-			System.out.println("(2)<---Ver tablero de posiciones");
-			System.out.println("(3)<---Salir del juego");
-			option = Integer.parseInt(in.nextLine());
-			switch(option) {
-				case START_GAME: 
-					startGame();
-				break;
-				
-				case SHOW_POSITIONS: 
-					showPositions();
-				break;
-			}
-		}while(option < 3);
-	}
-	*/
 }
