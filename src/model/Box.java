@@ -7,6 +7,7 @@ public class Box {
 	Box up;
 	Box down;
 	String mirror;
+	boolean visibility;
 	int numRow;
 	int numColumn;
 	
@@ -16,6 +17,7 @@ public class Box {
 		up = null;
 		down = null;
 		mirror = null;
+		visibility = false;
 		this.numRow = numRow;
 		this.numColumn = numColumn;
 	}
@@ -58,6 +60,14 @@ public class Box {
 	
 	public String getMirror() {
 		return mirror; 
+	}
+	
+	public void setVisibility(boolean visibility) {
+		this.visibility = visibility;
+	}
+	
+	public boolean getVisibility() {
+		return visibility;
 	}
 	
 	public void setNumRow(int numRow) {

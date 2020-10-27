@@ -51,13 +51,17 @@ public class Menu {
 		int k = Integer.parseInt(dataGame[3]);
 		String areaGame = laserGame.createPlayArea(nickname, n, m, k);
 		System.out.println(areaGame);
-		
+		String input = in.nextLine();
+		repeatGame(input,n,m,k, nickname);
 	}
 	
-	public void continueGame(String input,int n,int m, int k) {
-		if((int)(input.charAt(0))<=n) {
-			
+	public void repeatGame(String input, int n, int m, int k, String nickname) {
+		if(input.equalsIgnoreCase("menu") && laserGame.getKGlobal()!=0) {
+			System.out.println(laserGame.startGame(input, nickname));
+			String newInput = in.nextLine();
+			repeatGame(newInput,n,m,k, nickname);
 		}
+		System.out.println("Salio del juego");
 	}
 	
 	public void showPositions() {

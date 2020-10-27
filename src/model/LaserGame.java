@@ -4,6 +4,7 @@ public class LaserGame {
 
 	User root;
 	Box first;
+	int kGlobal; 
 	
 	public LaserGame() {
 		
@@ -16,13 +17,29 @@ public class LaserGame {
 		createAllRows(current,n-1);
 		createConectionManagement(current);
 		generateRandomMirrors(k, n, m);
-		String area = printAreaGame(current);
+		kGlobal = k;
+		String area = nickname+ "  |  " + k + " espejos restantes por encontrar\n";
+		area += printAreaGame(current);
 		
 		return area; 
 	}
 	
-	public void startGame(String input) {
-		
+	public String startGame(String input, String nickname) {
+		String answer = "";
+		if(input.charAt(0)=='L') {
+			int n = (int)(input.charAt(1));
+			int m = (int)(input.charAt(2));
+			n = n-49+1;
+			m = m-65+1;
+			String direction = String.valueOf(input.charAt(3));
+			String temp = locateMirror(n, m, direction);
+			answer += nickname + "  |  " + kGlobal + " espejos restantes por encontrar";
+			answer += printAreaGame(first)+"\n";
+			answer += temp;
+		}else {
+			
+		}
+		return answer;
 	}
 	
 	public void createColumns(Box current ,int m) {
@@ -112,12 +129,33 @@ public class LaserGame {
 		return search;
 	}
 	
+	public String locateMirror(int n, int m, String direction) {
+		String answer = "";
+		Box searchBox = searchPosition(first, n, m);
+		if(direction.equalsIgnoreCase("L")) {
+			direction = "/";
+		}else if(direction.equalsIgnoreCase("R")) {
+			direction = "\\";
+		}
+		
+		if(searchBox.getMirror() == null ) {
+			answer += "No se encontro ningun espejo";
+		}else if(searchBox.getMirror() != null && searchBox.getMirror().equalsIgnoreCase(direction)) {
+			searchBox.setVisibility(true);
+			answer += "Se encontro un espejo";
+			kGlobal -= 1;
+		}
+		return answer; 
+	}
+	
 	public String printAreaGame(Box current) {
 		String answer = "";
 		if(current != null) {
 			if(current.getMirror()==null) {
 				answer += "[ ] ";
-			}else {
+			}else if(current.getMirror()!=null && current.getVisibility()==false) {
+				answer += "[ ] ";
+			}else if(current.getMirror()!=null && current.getVisibility()==true){
 				answer += "[" + current.getMirror() + "] ";
 			}
 			answer += printRows(current.getRight());
@@ -131,7 +169,9 @@ public class LaserGame {
 		if(current!= null) {
 			if(current.getMirror()==null) {
 				answer += "[ ] ";
-			}else {
+			}else if(current.getMirror()!=null && current.getVisibility()==false) {
+				answer += "[ ] ";
+			}else if(current.getMirror()!=null && current.getVisibility()==true){
 				answer += "["+ current.getMirror() + "] ";
 			}
 			answer += printRows(current.getRight());
@@ -139,5 +179,9 @@ public class LaserGame {
 			answer += "\n";
 		}
 		return answer;
+	}
+	
+	public int getKGlobal() {
+		return kGlobal;
 	}
 }
