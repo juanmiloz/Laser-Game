@@ -52,6 +52,14 @@ public class Box {
 		return down;
 	}
 	
+	public void setMirror(String mirror) {
+		this.mirror = mirror;
+	}
+	
+	public String getMirror() {
+		return mirror; 
+	}
+	
 	public void setNumRow(int numRow) {
 		this.numRow = numRow;
 	}

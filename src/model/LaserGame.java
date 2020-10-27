@@ -15,8 +15,8 @@ public class LaserGame {
 		createColumns(current, m-1);
 		createAllRows(current,n-1);
 		createConectionManagement(current);
+		
 		System.out.println(printAreaGame(current));
-		System.out.println(first.getRight().getRight().getNumColumn());
 	}
 	
 	public void startGame(String input) {
@@ -62,6 +62,52 @@ public class LaserGame {
 			newConection.setLeft(current.getDown());
 			addConectionHorizontal(current.getDown());
 		}
+	}
+	
+	public void generateRandomMirrors(int k, int n, int m) {
+		if(k!=0) {
+			int numRandomN = (int)(Math.random()*n+1);
+			int numRandomM = (int)(Math.random()*m+1);
+			Box search = searchPosition(first, numRandomN, numRandomM);
+			if(search.getMirror() == null) {
+				int mirrorRandom = (int)(Math.random()*2+1);
+				if(mirrorRandom==1) {
+					search.setMirror("/");
+				}else if(mirrorRandom==2) {
+					search.setMirror("\\");
+				}
+				generateRandomMirrors(k-1,n,m);
+			}else {
+				generateRandomMirrors(k, n, m);
+			}
+		}
+	}
+	
+	public Box searchPosition(Box current, int numRow, int numColumn) {
+		Box search = null;
+		if(current!=null) {
+			if(current.getNumRow() == numRow && current.getNumColumn() == numColumn) {
+				return current;
+			}else {
+				search = searchInRow(current.getRight(),numRow,numColumn);
+			}
+			if(search==null) {
+				search = searchPosition(current.getDown(),numRow,numColumn);
+			}
+		}
+		return search; 
+	}
+	
+	public Box searchInRow(Box current, int numRow, int numColumn) {
+		Box search = null;
+		if(current!=null) {
+			if(current.getNumRow() == numRow && current.getNumColumn() == numColumn) {
+				return current;
+			}else {
+				search = searchInRow(current.getRight(), numRow, numColumn);
+			}
+		}
+		return search;
 	}
 	
 	public String printAreaGame(Box current) {
