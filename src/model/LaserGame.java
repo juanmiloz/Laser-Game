@@ -9,14 +9,16 @@ public class LaserGame {
 		
 	}
 	
-	public void createPlayArea(String nickname, int n, int m, int k) {
+	public String createPlayArea(String nickname, int n, int m, int k) {
 		first = new Box(1, 1);
 		Box current = first;
 		createColumns(current, m-1);
 		createAllRows(current,n-1);
 		createConectionManagement(current);
+		generateRandomMirrors(k, n, m);
+		String area = printAreaGame(current);
 		
-		System.out.println(printAreaGame(current));
+		return area; 
 	}
 	
 	public void startGame(String input) {
@@ -113,8 +115,12 @@ public class LaserGame {
 	public String printAreaGame(Box current) {
 		String answer = "";
 		if(current != null) {
-			answer += "[ ]";
-			answer += printRows(current);
+			if(current.getMirror()==null) {
+				answer += "[ ] ";
+			}else {
+				answer += "[" + current.getMirror() + "] ";
+			}
+			answer += printRows(current.getRight());
 			answer += printAreaGame(current.getDown());
 		}
 		return answer;
@@ -122,35 +128,16 @@ public class LaserGame {
 	
 	public String printRows(Box current) {
 		String answer = "";
-		if(current.getRight()!= null) {
-			answer += "[ ]";
+		if(current!= null) {
+			if(current.getMirror()==null) {
+				answer += "[ ] ";
+			}else {
+				answer += "["+ current.getMirror() + "] ";
+			}
 			answer += printRows(current.getRight());
 		}else {
 			answer += "\n";
 		}
 		return answer;
-	}
-	
-		
-	//imprimir con ciclo por ahora
-	public String printColumns() {
-		boolean exit = false;
-		String print = "";
-		Box current = first;
-		while(!exit) {
-			if(current != null) {
-				print += current.getNumRow() +"."+ current.getNumColumn() + " ";
-				Box otherCurrent = current.getDown();
-				while(otherCurrent != null) {
-					print += otherCurrent.getNumRow() + "." + otherCurrent.getNumColumn() + " "; 
-					otherCurrent = otherCurrent.getDown();
-				}
-				print += "\n";
-				current = current.getRight();
-			}else {
-				exit = true;
-			}
-		}
-		return print; 
 	}
 }

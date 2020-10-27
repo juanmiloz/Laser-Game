@@ -49,7 +49,8 @@ public class Menu {
 		int n = Integer.parseInt(dataGame[1]);
 		int m = Integer.parseInt(dataGame[2]);
 		int k = Integer.parseInt(dataGame[3]);
-		laserGame.createPlayArea(nickname, n, m, k);
+		String areaGame = laserGame.createPlayArea(nickname, n, m, k);
+		System.out.println(areaGame);
 		
 	}
 	
