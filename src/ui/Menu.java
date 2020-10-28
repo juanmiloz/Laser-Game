@@ -56,12 +56,13 @@ public class Menu {
 	}
 	
 	public void repeatGame(String input, int n, int m, int k, String nickname) {
-		if(input.equalsIgnoreCase("menu") && laserGame.getKGlobal()!=0) {
+		if(!input.equalsIgnoreCase("menu") && laserGame.getKGlobal()!=0) {
 			System.out.println(laserGame.startGame(input, nickname));
 			String newInput = in.nextLine();
 			repeatGame(newInput,n,m,k, nickname);
+		}else {
+			System.out.println("Termino el juego");
 		}
-		System.out.println("Salio del juego");
 	}
 	
 	public void showPositions() {
