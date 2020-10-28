@@ -53,20 +53,32 @@ public class Menu {
 		System.out.println(areaGame);
 		String input = in.nextLine();
 		repeatGame(input,n,m,k, nickname);
+		User newUser = new User(nickname, laserGame.getScore());
+		laserGame.addUser(newUser);
 	}
 	
 	public void repeatGame(String input, int n, int m, int k, String nickname) {
 		if(!input.equalsIgnoreCase("menu") && laserGame.getKGlobal()!=0) {
-			System.out.println(laserGame.startGame(input, nickname));
-			String newInput = in.nextLine();
-			repeatGame(newInput,n,m,k, nickname);
+			System.out.println(laserGame.startGame(input, nickname, n, m));
+			if(laserGame.getKGlobal()!=0) {
+				String newInput = in.nextLine();
+				repeatGame(newInput,n,m,k, nickname);
+			}else {
+				repeatGame("",n,m,k, nickname);
+			}
 		}else {
-			System.out.println("Termino el juego");
+			if(input.equalsIgnoreCase("menu")) {
+				System.out.println("Termino el juego");
+				System.out.println(nickname + " obtuvo: " + laserGame.getScore() + "puntos");
+			}else {
+				System.out.println("Felicitaciones, encontro todos los espejos");
+				System.out.println(nickname + " obtuvo: " + laserGame.getScore() + "puntos");
+			}
 		}
 	}
 	
 	public void showPositions() {
-		System.out.println();
+		System.out.println("\n"+laserGame.scoreInorden());
 	}
 	
 	public void startProgram() {

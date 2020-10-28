@@ -17,7 +17,7 @@ public class Box {
 		up = null;
 		down = null;
 		mirror = null;
-		visibility = true;
+		visibility = false;
 		this.numRow = numRow;
 		this.numColumn = numColumn;
 	}
