@@ -44,6 +44,12 @@ public class LaserGame {
 			m = m-65+1;
 			Box search = searchPosition(first, n, m);
 			Box end = managementMovementsNoCorners(search, n, m);
+			answer += nickname + "  |  " + kGlobal + " espejos restantes por encontrar\n";
+			int nStard = search.getNumRow();
+			int mStard = search.getNumColumn();
+			int nEnd = end.getNumRow();
+			int mEnd = end.getNumColumn();
+			answer += printAreaGameWhitLaser(first,nStard,mStard,nEnd,mEnd);
 			answer += "El espejo salio por " + end.getNumRow() + "." + end.getNumColumn();
 		}
 		return answer;
@@ -280,6 +286,47 @@ public class LaserGame {
 		String answer = "";
 		if(current!= null) {
 			if(current.getMirror()==null) {
+				answer += "[ ] ";
+			}else if(current.getMirror()!=null && current.getVisibility()==false) {
+				answer += "[ ] ";
+			}else if(current.getMirror()!=null && current.getVisibility()==true){
+				answer += "["+ current.getMirror() + "] ";
+			}
+			answer += printRows(current.getRight());
+		}else {
+			answer += "\n";
+		}
+		return answer;
+	}
+	
+	public String printAreaGameWhitLaser(Box current, int nStart, int mStart, int nEnd, int mEnd) {
+		String answer = "";
+		if(current != null) {
+			if(current.getNumRow() == nStart && current.getNumColumn() == mStart) {
+				answer += "[S] ";
+			}else if(current.getNumRow()==nEnd && current.getNumColumn()==mEnd) {
+				answer += "[E] ";
+			}else if(current.getMirror()==null) {
+				answer += "[ ] ";
+			}else if(current.getMirror()!=null && current.getVisibility()==false) {
+				answer += "[ ] ";
+			}else if(current.getMirror()!=null && current.getVisibility()==true){
+				answer += "[" + current.getMirror() + "] ";
+			}
+			answer += printRowsWhitLaser(current.getRight(),nStart, mStart, nEnd, mEnd);
+			answer += printAreaGame(current.getDown());
+		}
+		return answer;
+	}
+	
+	public String printRowsWhitLaser(Box current, int nStart, int mStart, int nEnd, int mEnd) {
+		String answer = "";
+		if(current!= null) {
+			if(current.getNumRow() == nStart && current.getNumColumn() == mStart) {
+				answer += "[S] ";
+			}else if(current.getNumRow()==nEnd && current.getNumColumn()==mEnd) {
+				answer += "[E] ";
+			}else if(current.getMirror()==null) {
 				answer += "[ ] ";
 			}else if(current.getMirror()!=null && current.getVisibility()==false) {
 				answer += "[ ] ";
