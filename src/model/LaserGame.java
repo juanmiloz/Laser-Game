@@ -1,7 +1,14 @@
 package model;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 public class LaserGame {
 
+	private final static String FILE_SERIALIZABLE_ROOT = "data/serializableRoot.ap2";
 	User root;
 	Box first;
 	int kGlobal; 
@@ -29,10 +36,12 @@ public class LaserGame {
 	public String startGame(String input, String nickname, int nMatriz,int mMatriz) {
 		String answer = "";
 		Box upperLeftCorner = searchPosition(first, 1, 1);
-		Box lowerLeftCorner = searchPosition(first, 1, nMatriz);
+		Box lowerLeftCorner = searchPosition(first, nMatriz,1 );
 		Box upperRightCorner = searchPosition(first, 1, mMatriz);
 		Box lowerRightCorner = searchPosition(first, nMatriz, mMatriz);
 		int lenghtInput = input.length();
+		
+		boolean comprobate = cornerOrNoCorner(input, lenghtInput);
 		
 		if(input.charAt(0)=='L') {
 			int n = (int)(input.charAt(1));
@@ -42,70 +51,170 @@ public class LaserGame {
 			String direction = String.valueOf(input.charAt(3));
 			String temp = locateMirror(n, m, direction);
 			answer += nickname + "  |  " + kGlobal + " espejos restantes por encontrar\n";
-			answer += printAreaGame(first)+"\n";
+			if(temp.equalsIgnoreCase("Se encontro un espejo")) {
+				answer += printAreaGame(first)+"\n";
+			}else {
+				answer += printAreaGame(first,n,m);
+			}
 			answer += temp;
-		}else{
-			int n = (int)(input.charAt(0));
-			int m = (int)(input.charAt(1));
-			n = n-49+1;
-			m = m-65+1;
+		}else if(comprobate == false){
+			int i = 0; 
+			String newNumber = "";
+			String number = noCornerPositionN(input,i,lenghtInput-1,newNumber);
+			StringBuilder sb = new StringBuilder(number);
+			sb.setLength(lenghtInput-1);
+			number = String.valueOf(sb);
+			int n = Integer.parseInt(number);
+			int m = NoCornerPositionM(input, lenghtInput-1);
 			Box search = searchPosition(first, n, m);
 			Box end = managementMovementsNoCorners(search, nMatriz, mMatriz);
 			answer += nickname + "  |  " + kGlobal + " espejos restantes por encontrar\n";
 			int nStard = search.getNumRow();
 			int mStard = search.getNumColumn();
+			System.out.println("el laser entro en: "+ search.getNumRow()+"."+search.getNumColumn());
 			int nEnd = end.getNumRow();
 			int mEnd = end.getNumColumn();
 			answer += printAreaGameWhitLaser(first,nStard,mStard,nEnd,mEnd);
-			answer += "El espejo salio por " + end.getNumRow() + "." + end.getNumColumn();
+			answer += "El laser salio por " + end.getNumRow() + "." + end.getNumColumn();
+		}else if(comprobate == true) {
+			int i = 0; 
+			String newNumber = "";
+			String number = noCornerPositionN(input,i,lenghtInput-2,newNumber);
+			StringBuilder sb = new StringBuilder(number);
+			sb.setLength(lenghtInput-2);
+			number = String.valueOf(sb);
+			int n = Integer.parseInt(number);
+			int m = NoCornerPositionM(input, lenghtInput-2);
+			String direction = String.valueOf(input.charAt(lenghtInput-1));
+			Box search = searchPosition(first, n, m);
+			Box end = managementMovementCorner(upperLeftCorner, lowerLeftCorner, upperRightCorner, lowerRightCorner, search, direction);
+			answer += nickname + "  |  " + kGlobal + " espejos restantes por encontrar\n";
+			int nStard = search.getNumRow();
+			int mStard = search.getNumColumn();
+			System.out.println("el laser entro en: "+ search.getNumRow()+"."+search.getNumColumn());
+			int nEnd = end.getNumRow();
+			int mEnd = end.getNumColumn();
+			answer += printAreaGameWhitLaser(first,nStard,mStard,nEnd,mEnd);
+			answer += "El laser salio por " + end.getNumRow() + "." + end.getNumColumn();
 		}
 		return answer;
 	}
 	
+	public boolean cornerOrNoCorner(String input, int lenght) {
+		boolean corner = true;
+
+		if(Character.isDigit(input.charAt(lenght-2))) {
+			corner = false; 
+		}
+		
+		return corner;
+	}
 	
-	
+	public String noCornerPositionN(String input,int i, int lenght, String number) {
+		if(i<lenght) {
+			number = String.valueOf(input.charAt(i));
+			number += noCornerPositionN(input,i+1,lenght, number);
+		}
+		return number;
+	}
+
+	public int NoCornerPositionM(String input, int lenght) {
+		int m = (int)(input.charAt(lenght));
+		m = m-65+1;
+		return m;
+	}
 	//inicio metodos movimiento	
+	//Quedo re largo por la cantidad de casos que pueden ocurrir :)
+	public Box managementMovementCorner(Box upperLeftCorner, Box lowerLeftCorner, Box upperRightCorner, Box lowerRightCorner, Box current, String direction) {
+		if(current.equals(upperLeftCorner)) {
+			if(direction.equalsIgnoreCase("R")) {
+				current = movementRight(current);
+			}else if(direction.equalsIgnoreCase("D")) {
+				current = movementDown(current);
+			}
+		}else if(current.equals(lowerLeftCorner)) {
+			if(direction.equalsIgnoreCase("R")) {
+				current = movementRight(current);
+			}else if(direction.equalsIgnoreCase("U")) {
+				current = movementUp(current);
+			}
+		}else if(current.equals(upperRightCorner)) {
+			if(direction.equalsIgnoreCase("L")) {
+				current = movementLeft(current);
+			}else if(direction.equalsIgnoreCase("D")) {
+				current = movementDown(current);
+			}
+		}else if(current.equals(lowerRightCorner)) {
+			if(direction.equalsIgnoreCase("L")) {
+				current = movementLeft(current);
+			}else if(direction.equalsIgnoreCase("U")) {
+				current = movementUp(current);
+			}
+		}
+		return current;
+	}
+	
 	public Box managementMovementsNoCorners(Box current, int nMatriz, int mMatriz) {
 		if(current.getNumColumn()==1) {
-			if(current.getMirror()!=null) {
-				if(current.getMirror().equalsIgnoreCase("/")) {
-					current = verticalUp(current);
-				}else if(current.getMirror().equalsIgnoreCase("\\")) {
-					current = verticalDown(current);
-				}
-			}else {
-				current = horizontalRight(current);
-			}
+			current = movementRight(current);
 		}else if(current.getNumRow()==1) {
-			if(current.getMirror()!=null) {
-				if(current.getMirror().equalsIgnoreCase("/")) {
-					current = horizontalLeft(current);
-				}else if(current.getMirror().equalsIgnoreCase("\\")) {
-					current = horizontalRight(current);
-				}
-			}else {
+			current = movementDown(current);
+		}else if(current.getNumColumn()==mMatriz) {
+			current = movementLeft(current);
+		}else if(current.getNumRow()==nMatriz) {
+			current = movementUp(current);
+		}
+		return current;
+	}
+	
+	public Box movementRight(Box current) {
+		if(current.getMirror()!=null) {
+			if(current.getMirror().equalsIgnoreCase("/")) {
+				current = verticalUp(current);
+			}else if(current.getMirror().equalsIgnoreCase("\\")) {
 				current = verticalDown(current);
 			}
-		}else if(current.getNumColumn()==mMatriz) {
-			if(current.getMirror()!=null) {
-				if(current.getMirror().equalsIgnoreCase("/")) {
-					current = verticalDown(current);
-				}else if(current.getMirror().equalsIgnoreCase("\\")) {
-					current = verticalUp(current);
-				}
-			}else {
-				current = horizontalLeft(current);
-			}
-		}else if(current.getNumRow()==nMatriz) {
-			if(current.getMirror()!=null) {
-				if(current.getMirror().equalsIgnoreCase("/")) {
-					current = horizontalRight(current);
-				}else if(current.getMirror().equalsIgnoreCase("\\")) {
-					current = horizontalLeft(current);
-				}
-			}else {
+		}else {
+			current = horizontalRight(current);
+		}
+		return current;
+	}
+	
+	public Box movementLeft(Box current) {
+		if(current.getMirror()!=null) {
+			if(current.getMirror().equalsIgnoreCase("/")) {
+				current = verticalDown(current);
+			}else if(current.getMirror().equalsIgnoreCase("\\")) {
 				current = verticalUp(current);
 			}
+		}else {
+			current = horizontalLeft(current);
+		}
+		return current;
+	}
+	
+	public Box movementUp(Box current) {
+		if(current.getMirror()!=null) {
+			if(current.getMirror().equalsIgnoreCase("/")) {
+				current = horizontalRight(current);
+			}else if(current.getMirror().equalsIgnoreCase("\\")) {
+				current = horizontalLeft(current);
+			}
+		}else {
+			current = verticalUp(current);
+		}
+		return current;
+	}
+	
+	public Box movementDown(Box current) {
+		if(current.getMirror()!=null) {
+			if(current.getMirror().equalsIgnoreCase("/")) {
+				current = horizontalLeft(current);
+			}else if(current.getMirror().equalsIgnoreCase("\\")) {
+				current = horizontalRight(current);
+			}
+		}else {
+			current = verticalDown(current);
 		}
 		return current;
 	}
@@ -305,12 +414,49 @@ public class LaserGame {
 		return answer;
 	}
 	
+	public String printAreaGame(Box current,int nError, int mError) {
+		String answer = "";
+		if(current != null) {
+			if(current.getVisibility()!=true && current.getNumRow() == nError && current.getNumColumn() == mError) {
+				answer += "[X] ";
+			}else if(current.getMirror()==null) {
+				answer += "[ ] ";
+			}else if(current.getMirror()!=null && current.getVisibility()==false) {
+				answer += "[ ] ";
+			}else if(current.getMirror()!=null && current.getVisibility()==true){
+				answer += "[" + current.getMirror() + "] ";
+			}
+			answer += printRows(current.getRight(), nError, mError);
+			answer += printAreaGame(current.getDown(),nError,mError);
+		}
+		return answer;
+	}
+	
+	public String printRows(Box current,int nError, int mError) {
+		String answer = "";
+		if(current!= null) {
+			if(current.getVisibility()!=true && current.getNumRow() == nError && current.getNumColumn() == mError) {
+				answer += "[X] ";
+			}else if(current.getMirror()==null) {
+				answer += "[ ] ";
+			}else if(current.getMirror()!=null && current.getVisibility()==false) {
+				answer += "[ ] ";
+			}else if(current.getMirror()!=null && current.getVisibility()==true){
+				answer += "["+ current.getMirror() + "] ";
+			}
+			answer += printRows(current.getRight(),nError,mError);
+		}else {
+			answer += "\n";
+		}
+		return answer;
+	}
+	
 	public String printAreaGameWhitLaser(Box current, int nStart, int mStart, int nEnd, int mEnd) {
 		String answer = "";
 		if(current != null) {
-			if(current.getNumRow() == nStart & current.getNumColumn() == mStart) {
+			if(current.getNumRow() == nStart && current.getNumColumn() == mStart) {
 				answer += "[S] ";
-			}else if(current.getNumRow()==nEnd & current.getNumColumn()==mEnd) {
+			}else if(current.getNumRow()==nEnd && current.getNumColumn()==mEnd) {
 				answer += "[E] ";
 			}else if(current.getMirror()==null) {
 				answer += "[ ] ";
@@ -320,7 +466,7 @@ public class LaserGame {
 				answer += "[" + current.getMirror() + "] ";
 			}
 			answer += printRowsWhitLaser(current.getRight(),nStart, mStart, nEnd, mEnd);
-			answer += printAreaGame(current.getDown());
+			answer += printAreaGameWhitLaser(current.getDown(),nStart, mStart, nEnd, mEnd);
 		}
 		return answer;
 	}
@@ -328,9 +474,9 @@ public class LaserGame {
 	public String printRowsWhitLaser(Box current, int nStart, int mStart, int nEnd, int mEnd) {
 		String answer = "";
 		if(current!= null) {
-			if(current.getNumRow() == nStart & current.getNumColumn() == mStart) {
+			if(current.getNumRow() == nStart && current.getNumColumn() == mStart) {
 				answer += "[S] ";
-			}else if(current.getNumRow()==nEnd & current.getNumColumn()==mEnd) {
+			}else if(current.getNumRow()==nEnd && current.getNumColumn()==mEnd) {
 				answer += "[E] ";
 			}else if(current.getMirror()==null) {
 				answer += "[ ] ";
@@ -339,7 +485,7 @@ public class LaserGame {
 			}else if(current.getMirror()!=null && current.getVisibility()==true){
 				answer += "["+ current.getMirror() + "] ";
 			}
-			answer += printRows(current.getRight());
+			answer += printRowsWhitLaser(current.getRight(),nStart,mStart,nEnd,mEnd);
 		}else {
 			answer += "\n";
 		}
@@ -376,26 +522,24 @@ public class LaserGame {
 	
 	public String scoreInorden(User current) {
 		String scores = "";
-		if(current.getLeft()!=null) {
-			User sonLeft = current.getLeft();
-			if(sonLeft.getLeft()==null) {
-				scores += sonLeft.getNickname() +"========>" +sonLeft.getScore()+"\n";
-			}else {
-				scoreInorden(sonLeft);
-			}
+		if(current!=null) {
+			scores += scoreInorden(current.getLeft());
+			scores += current.getNickname() + " ========> " + current.getScore() + "\n";
+			scores += scoreInorden(current.getRight());
 		}
-		if(current.getLeft()!=null) {
-			User sonRight = current.getRight();
-			if(sonRight != null && sonRight.getRight()==null) {
-				scores += sonRight.getNickname() +"========>" +sonRight.getScore()+"\n";
-			}else {
-				scoreInorden(sonRight);
-			}
-		}
-
-		scores += current.getNickname() +"========>" +current.getScore()+"\n";
-		
 		return scores;
+	}
+	
+	public void saveRoot() throws IOException {
+		ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_SERIALIZABLE_ROOT));
+		oos.writeObject(root);
+		oos.close();
+	}
+	
+	public void loadRoot() throws IOException, ClassNotFoundException{	
+		ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_SERIALIZABLE_ROOT));
+		root = (User)ois.readObject();
+		ois.close();
 	}
 	
 	public int getKGlobal() {
